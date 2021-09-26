@@ -1,8 +1,7 @@
 <?php
 
 // https://github.com/discord-php
-// #leffahenki channel_id = 712931919763079199
-// #botspam channel_id = 779014748103901224
+
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
 use Discord\Parts\Embed\Embed;
@@ -26,7 +25,6 @@ use Monolog\Logger;
 
 
 require __DIR__ . '/vendor/autoload.php';
-
 
 // Load environment file
 $dotenv = Dotenv::createImmutable(__DIR__);
@@ -128,20 +126,20 @@ $discord->on('ready', function (Discord $discord) use ($commands, $shell, $brows
 			$message->reply('Pong!');
 			break;
 		case '!url':
-			$message->replyToChannel("**Live:** https://kaaosradio.fi:8001/stream \n**Chiptune:** https://kaaosradio.fi:8001/chip \n**Chillout:** https://kaaosradio.fi:8001/chill \n**Stream2:** https://kaaosradio.fi:8001/stream2".
+			$message->reply("**Live:** https://kaaosradio.fi:8001/stream \n**Chiptune:** https://kaaosradio.fi:8001/chip \n**Chillout:** https://kaaosradio.fi:8001/chill \n**Stream2:** https://kaaosradio.fi:8001/stream2".
 						"\n**Video:** https://videostream.kaaosradio.fi");
 			break;
 		case '!np chill':
 			$browser->get('https://kaaosradio.fi/npfile_chill_tags')->then(
 				function (ResponseInterface $response) use ($message) {
-					$message->replyToChannel($response->getBody());
+					$message->reply($response->getBody());
 				}
 			);
 			break;
 		case '!np chip':
 			$browser->get('https://kaaosradio.fi/npfile_chip_tags')->then(
 				function (ResponseInterface $response) use ($message) {
-					$message->replyToChannel($response->getBody());
+					$message->reply($response->getBody());
 				}
 			);
 			break;
@@ -149,14 +147,14 @@ $discord->on('ready', function (Discord $discord) use ($commands, $shell, $brows
 		case '!np stream2':
 			$browser->get('https://kaaosradio.fi/npfile_stream2_tags')->then(
 				function (ResponseInterface $response) use ($message) {
-					$message->replyToChannel($response->getBody());
+					$message->reply($response->getBody());
 				}
 			);
 			break;
 		case '!nytsoi':
 			$browser->get('https://kaaosradio.fi/nytsoi.txt')->then(
 				function (ResponseInterface $response) use ($message) {
-					$message->replyToChannel($response->getBody());
+					$message->reply($response->getBody());
 				}
 			);
 			break;
@@ -167,7 +165,7 @@ $discord->on('ready', function (Discord $discord) use ($commands, $shell, $brows
 			break;
 		case '!avatar':
 			$url = $message->author->getAvatarAttribute('png', 2048);
-			$message->replyToChannel($message->author->__toString(). ' avatar: '. $url);
+			$message->reply($message->author->__toString(). ' avatar: '. $url);
 			break;
 
 		case '!server':
@@ -247,7 +245,7 @@ function check_imdb($keyword, $message, $browser) {
 				$url = 'https://imdb.com/title/'.$data->imdbID;
 				//$response = '**'.$title.'** ('.$released.'), '.$runtime.', **Genre:** '.$genre.', '.**Actors:** '.$actors. ', '**URL:** '.$url;
 				$response = '**'.$title.'** ('.$released.'), '.$runtime.', **Genre:** '.$genre.', **Rating:** '.$rating. ', **URL:** '.$url;
-				$message->replyToChannel($response);
+				$message->reply($response);
 			}
 		}
 	);
