@@ -104,15 +104,7 @@ $discord->on('ready', function (Discord $discord) use ($commands, $shell, $brows
 			//$embed = generateHelpCommand($discord, $commands);
 			//$message->channel->sendEmbed($embed);
 		}
-		//} else {
-		//	$commands['info']->handle($message, $args);
-		//}
-		//file_put_contents($inputlogfile, "Command: ".$command.", args: ".print_r($args, true) .PHP_EOL, FILE_APPEND);
 
-		//file_put_contents($inputlogfile, PHP_EOL.'REQUEST:'.PHP_EOL, FILE_APPEND);
-		//file_put_contents($inputlogfile, print_r($_REQUEST, true), FILE_APPEND);
-		//file_put_contents($inputlogfile, PHP_EOL.'message:'.PHP_EOL, FILE_APPEND);
-		//file_put_contents($inputlogfile, print_r($message, true), FILE_APPEND);
 		switch ($command) {
 		case '!joke':
 			$browser->get('https://api.chucknorris.io/jokes/random')->then(
