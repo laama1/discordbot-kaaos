@@ -1,0 +1,7 @@
+/.env
+/composer.lock
+/composer_toimiva-2021-09-26.json
+/discord_token.txt
+/joku.txt
+/logs
+/vendor

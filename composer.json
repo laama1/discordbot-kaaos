@@ -1,0 +1,21 @@
+{
+    "name": "laama/discordbot",
+    "description": "Oma discordbot testi",
+    "require": {
+        "team-reflex/discord-php": "dev-master",
+        "vlucas/phpdotenv": "^5.2",
+        "phpdocumentor/reflection": "^4.0",
+        "davidcole1340/reactsh": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "LAama1",
+            "email": "centrifug@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "DPHP\\": "src/"
+        }
+    }
+}
