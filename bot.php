@@ -26,14 +26,24 @@ use Monolog\Logger;
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Omat plugarit
+require '/home/laama/public_html/telebot-kaaos/plugins/seuraavat.php';
+require '/home/laama/public_html/telebot-kaaos/plugins/np.php';
+require '/home/laama/public_html/telebot-kaaos/plugins/nytsoi.php';
+require '/home/laama/public_html/telebot-kaaos/plugins/kuuntelijat.php';
+
 // Load environment file
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 $dotenv->required('D_TOKEN', 'LOG_FILE');
 $dotenv->required('LOGGER_LEVEL')->allowedValues(array_keys(Logger::getLevels()));
+// $dotenv->required('LOGGER_LEVEL')->allowedValues([WARNING,ERROR,CRITICAL,ALERT,EMERGENCY]);
 
 $logger = new Logger('KD_Butt');
 $loop = Loop::get();
+// $last_song = '';
+// $timer = false;
+
 
 $browser = new Browser($loop);
 //$token = file_get_contents(dirname(__FILE__).'/discord_token.txt');
@@ -73,33 +83,43 @@ function generateHelpCommand(Discord $discord, array $commands): Embed
 }
 
 $commands = [
-	'!reflect' => new Reflect($discord),
-	'!info' => new Stats($discord),
-	'!events' => new Events($discord),
+	//'!reflect' => new Reflect($discord),
+	//'!info' => new Stats($discord),
+	//'!events' => new Events($discord),
+	'!seuraava' => new Seuraavat(1,1),
+	'!seuraavat' => new Seuraavat(0,1),
+	'!np' => new Np(),
+	'!nytsoi' => new Nytsoi(1),
+	'!kuuntelijat' => new Kuuntelijat(1),
 ];
 
-$activity = new Activity($discord, array('name' => 'kaaosradio', 'url' => 'https://kaaosradio.fi:8001/stream', 
+$activity = new Activity($discord, array('name' => 'kaaosradio',
+										'url' => 'https://kaaosradio.fi:8001/stream', 
 										'type' => Activity::TYPE_LISTENING,
 										'state' => Activity::STATUS_ONLINE));
 
 $discord->on('ready', function (Discord $discord) use ($commands, $shell, $browser, $activity) {
 	$discord->updatePresence($activity, false);
+
 	$discord->on('message', function (Message $message, Discord $discord) use ($browser, $commands) {
 		$inputlogfile = dirname(__FILE__). '/logs/input.log';
 		$input = file_get_contents("php://input");
 		$msg = strtolower($message->content);
 		$args = explode(' ', $msg);
-		//array_shift($args);
 
 		file_put_contents($inputlogfile, $input.PHP_EOL, FILE_APPEND);
 		file_put_contents($inputlogfile, $message->content .PHP_EOL, FILE_APPEND);
 		
-		//if (count($args) > 0) {
-		$command = array_shift($args);
+		//$command = array_shift($args);
+		$command = $args[0];
 		if (isset($commands[$command])) {
 			//array_shift($args);
 			file_put_contents($inputlogfile, "Command: ".$command.", args: ".print_r($args, true) .PHP_EOL, FILE_APPEND);
-			$commands[$command]->handle($message, $args);
+			//$commands[$command]->handle($message, $args);
+			if($response = $commands[$command]->handle($args)) {
+				$message->reply($response);
+			}
+			
 		} else {
 			//$embed = generateHelpCommand($discord, $commands);
 			//$message->channel->sendEmbed($embed);
@@ -121,36 +141,6 @@ $discord->on('ready', function (Discord $discord) use ($commands, $shell, $brows
 			$message->reply("**Live:** https://kaaosradio.fi:8001/stream \n**Chiptune:** https://kaaosradio.fi:8001/chip \n**Chillout:** https://kaaosradio.fi:8001/chill \n**Stream2:** https://kaaosradio.fi:8001/stream2".
 						"\n**Video:** https://videostream.kaaosradio.fi");
 			break;
-		case '!np chill':
-			$browser->get('https://kaaosradio.fi/npfile_chill_tags')->then(
-				function (ResponseInterface $response) use ($message) {
-					$message->reply($response->getBody());
-				}
-			);
-			break;
-		case '!np chip':
-			$browser->get('https://kaaosradio.fi/npfile_chip_tags')->then(
-				function (ResponseInterface $response) use ($message) {
-					$message->reply($response->getBody());
-				}
-			);
-			break;
-		case '!np':
-		case '!np stream2':
-			$browser->get('https://kaaosradio.fi/npfile_stream2_tags')->then(
-				function (ResponseInterface $response) use ($message) {
-					$message->reply($response->getBody());
-				}
-			);
-			break;
-		case '!nytsoi':
-			$browser->get('https://kaaosradio.fi/nytsoi.txt')->then(
-				function (ResponseInterface $response) use ($message) {
-					$message->reply($response->getBody());
-				}
-			);
-			break;
-
 		case '!disconnect':
 			$message->reply('Quitting! BYe!');
 			$discord->close();
@@ -216,9 +206,9 @@ function check_imdb($keyword, $message, $browser) {
 
 	$browser->get($apiurl)->then(
 		function (ResponseInterface $response) use ($message) {
-			$inputlogfile2 = dirname(__FILE__). '/logs/input.json';
+			//$inputlogfile2 = dirname(__FILE__). '/logs/input.json';
 			$data = json_decode($response->getBody());
-			file_put_contents($inputlogfile2, $response->getBody());
+			//file_put_contents($inputlogfile2, $response->getBody());
 			if ($data->Response == 'True') {
 				if (isset($data->totalResults)) {
 					$count = $data->totalResults;
